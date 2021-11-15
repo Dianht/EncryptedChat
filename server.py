@@ -4,7 +4,7 @@ from rsa import *
 
 #Connection Data
 host = '127.0.0.1'
-port = 5541
+port = 5556
 
 # Starting Server
 '''Lorsque l'on défini un socket on doit passer deux parametre
@@ -30,30 +30,15 @@ server.listen()
 # List For Clients and their Nicknames
 clients = []
 nicknames = []
-clePbs = []
 '''
     La fonction va nous servir à diffuser les messages
     Il va envoyer le message a chaque client 
 '''
 
-def info(message):
-    message = "INFO : " + message.decode('ascii')
-    for client in clients:
-        client.send(message.encode('ascii'))
-
 # Sending Messages to All Conected
 def broadcast(message):
     for client in clients:
         client.send(message)
-        #client.send(clePb[i])
-        #i += 1
-def msgKey():
-    i = 0
-    for client in clients:
-        str_m = "KEY " + clePbs[i][0].decode('ascii') + " " + clePbs[i][1].decode('ascii') 
-        client.send(str_m.encode('ascii'))
-        i += 1
-    clePbs.pop()    
 
 '''
     A chaque fois qu'un client sera connecté on lance la fonction
@@ -67,9 +52,7 @@ def handle(client):
         try:
             # Broadcasting Messages
             message = client.recv(1024)
-            print(message)
-            if len(clients) >= 2:
-                broadcast(message)
+            broadcast(message)
         except:
             # Removing and Closing Clients
             index = clients.index(client)
@@ -91,9 +74,6 @@ def handle(client):
 
 def receive():
     while True:
-            clePb = []
-            # On Regarde Combien De Clients il y en a
-            users = len(clients) + 1
             #Accept Connection
             client, address = server.accept()
             print("Connected with {}".format(str(address)))
@@ -101,24 +81,16 @@ def receive():
             # Request And Store Nickname
             client.send('NICK'.encode('ascii'))
             nickname = client.recv(1024).decode('ascii')
-            cle1 = client.recv(1024)
-            clePb.append(cle1)
-            cle2 = client.recv(1024)
-            clePb.append(cle2)
 
-            clePbs.insert(0,clePb)
             nicknames.append(nickname)
             clients.append(client)
-            
-            if len(clePbs) >= 2: 
-                msgKey()
             
                  
             # Print And Broadcast Nickname
             print("Nickname is {}".format(nickname))
-            info("{} joined!".format(nickname).encode('ascii'))
-            client.send(('Connected to server!\n'+ str(users) + '/2').encode('ascii'))
-            #client.send(('Connected to server!\n' + str(users) + '/2').encode('ascii'))
+            broadcast("{} joined!".format(nickname).encode('ascii'))
+            client.send(('Connected to server!\n').encode('ascii'))
+
             # Start Handling Thread For Client
             thread = threading.Thread(target=handle, args=(client,))
             thread.start()

@@ -5,9 +5,12 @@ from rsa import *
 
 print('Génération des clé en cours...')
 clePb,clePv = genRsaKeyPair(512)
-cle = []
+print('Votre clé publique : ',clePb)
 # Choosing Nickname
 nickname = input("Choisissiez votre pseudo : ")
+e = input('Entrez la clé publique de votre interlocuteur :\n e :')
+n = input('n : ')
+cle = [int(e),int(n)]
 '''
     On se connecte au server
     Le client a besoin de deux thread, un qui va recevoir constamment
@@ -16,7 +19,7 @@ nickname = input("Choisissiez votre pseudo : ")
 '''
 #Connection To Server
 client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-client.connect(('127.0.0.1',5555))
+client.connect(('127.0.0.1',5556))
 
 '''
     Fonction qui va constamment recevoir les messages et les afficher sur l'écran
@@ -32,25 +35,19 @@ def receive():
             # If 'NICK' Send Nickname
             message = client.recv(1024).decode('ascii')
             first_word = message.split(' ', 1)[0]
-
             if message == 'NICK':
                 client.send(nickname.encode('ascii'))
-                client.send(str(clePb[0]).encode('ascii'))
-                client.send(str(clePb[1]).encode('ascii'))
-            elif first_word == 'INFO':
-                info = client.recv(1024).decode('ascii')
-                print(info)
-            elif first_word == 'KEY':
-                e =  int(message.split(' ', 3)[1])
-                n = int(message.split(' ', 3)[2])
-                cle.append(e)
-                cle.append(n)
+            elif first_word == '-':
+                split_m = message.split(" ", 2)
+                if split_m[1] != nickname + ":":
+                    split_m = message.split(" ", 2)
+                    dec_m = rsa_dec(int(split_m[2]),clePv)
+                    print(split_m[0],split_m[1],dec_m)
             else:
                 print(message)
-                
         except:
-            # Close Connection When Erro
-            print("An error occured!")
+            # Close Connection When Error
+            print("Une erreur !\n, Avez vous bien renseigné une bonne clé ?")
             client.close()
             break
 
@@ -60,9 +57,9 @@ def receive():
 # Sending Messages to Server
 def write():
     while True:
-        message = input("")
-        enc_m = rsa_enc(message,cle)
-        message = '{}: {}'.format(nickname,enc_m)
+        enc_m = input(nickname + ': ')
+        enc_m = rsa_enc(enc_m,cle)
+        message = '- {}: {}'.format(nickname, enc_m)
         client.send(message.encode('ascii'))
 
 '''
