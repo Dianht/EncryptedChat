@@ -4,7 +4,7 @@ from rsa import *
 
 #Connection Data
 host = '127.0.0.1'
-port = 5556
+port = 5555
 
 # Starting Server
 '''Lorsque l'on défini un socket on doit passer deux parametre
@@ -52,6 +52,7 @@ def handle(client):
         try:
             # Broadcasting Messages
             message = client.recv(1024)
+            print(message)
             broadcast(message)
         except:
             # Removing and Closing Clients
@@ -81,7 +82,6 @@ def receive():
             # Request And Store Nickname
             client.send('NICK'.encode('ascii'))
             nickname = client.recv(1024).decode('ascii')
-
             nicknames.append(nickname)
             clients.append(client)
             
