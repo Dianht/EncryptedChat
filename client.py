@@ -18,7 +18,6 @@ user.enterText('Entrez votre pseudo et la clé publique de votre interlocuteur')
 while True:
     if user.completed() == True:
         break
-print("sal")
 '''
     On se connecte au server
     Le client a besoin de deux thread, un qui va recevoir constamment
@@ -68,12 +67,11 @@ def receive():
 # Sending Messages to Server
 def write():
     while True:
-        if user.text != "":
-            user.message = user.text 
+        if user.entryEmpty != False:
             enc_m = rsa_enc(user.message,user.notMyKey)
             message = '- {}: {}'.format(user.nickname, enc_m)
             client.send(message.encode('ascii'))
-            user.text = ""
+            user.entryEmpty = False
 '''
     Deux threads qui vont lancer les deux fonctions
 '''

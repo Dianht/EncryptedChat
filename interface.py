@@ -11,9 +11,8 @@ class User:
                 self.nickname = "Anonyme"
                 self.notMyKey = [0,1]
                 self.myKey = [0,1]
-                self.text = ""
                 self.message = ""
-                
+                self.entryEmpty = False
                 builder = Gtk.Builder()
                 builder.add_from_file('glade/client_interface.glade')  # Rentrez évidemment votre fichier, pas le miens!
 
@@ -45,7 +44,8 @@ class User:
                         self.nickname = text
                         print(self.nickname)
                 else : 
-                        self.text = text 
+                        self.entryEmpty = True
+                        self.message = text 
                         self.entry.set_text("")
 
         def onActivateE(self,e):
