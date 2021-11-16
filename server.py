@@ -51,7 +51,7 @@ def handle(client):
     while True:
         try:
             # Broadcasting Messages
-            message = client.recv(1024)
+            message = client.recv(2048)
             print(message)
             broadcast(message)
         except:
@@ -81,7 +81,7 @@ def receive():
             
             # Request And Store Nickname
             client.send('NICK'.encode('ascii'))
-            nickname = client.recv(1024).decode('ascii')
+            nickname = client.recv(2048).decode('ascii')
             nicknames.append(nickname)
             clients.append(client)
             

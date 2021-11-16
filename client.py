@@ -10,7 +10,7 @@ gui_thread.start()
 
 
 user.enterText('Génération des clé en cours...')
-key = genRsaKeyPair(512)
+key = genRsaKeyPair(2048)
 user.setUserKey(key)
 user.enterText('Entrez votre pseudo et la clé publique de votre interlocuteur')
 
@@ -41,7 +41,7 @@ def receive():
         try:
             # Receive Message From Server
             # If 'NICK' Send Nickname
-            message = client.recv(1024).decode('ascii')
+            message = client.recv(2048).decode('ascii')
             first_word = message.split(' ', 1)[0]
             
             if message == 'NICK':
