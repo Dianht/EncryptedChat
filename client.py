@@ -3,20 +3,21 @@ import threading
 from rsa import *
 from interface import *
 
-user = User();
+user = UserInterface();
 
 gui_thread = threading.Thread(target=user.main)
 gui_thread.start()
 
 
-user.enterText('Génération des clé en cours...')
-key = genRsaKeyPair(2048)
-user.setUserKey(key)
-user.enterText('Entrez votre pseudo et la clé publique de votre interlocuteur')
+user.enter_text('Génération des clé en cours... 🔑')
+key = gen_rsa_key(2048)
+
+user.set_user_key(key)
+user.enter_text('Entrez votre pseudo et la clé publique de votre interlocuteur')
 
 # Choosing Nickname
 while True:
-    if user.completed() == True:
+    if user.information() == True:
         break
 '''
     On se connecte au server
@@ -50,11 +51,11 @@ def receive():
                 split_m = message.split(' ', 2)
                 if split_m[1] != user.nickname+":":
                     dec_m = rsa_dec(int(split_m[2]),user.myKey[1])
-                    user.enterText(split_m[0] + split_m[1] + " " + str(dec_m))
+                    user.enter_text(split_m[0] + split_m[1] + " " + str(dec_m))
                 else:
-                    user.enterText(split_m[0] + split_m[1] + " " + user.message)
+                    user.enter_text(split_m[0] + split_m[1] + " " + user.message)
             else: 
-                user.enterText(message)
+                user.enter_text(message)
         except:
             # Close Connection When Error
             print("Une erreur !\n, Avez vous bien renseigné une bonne clé ?")
@@ -67,11 +68,14 @@ def receive():
 # Sending Messages to Server
 def write():
     while True:
-        if user.entryEmpty != False:
-            enc_m = rsa_enc(user.message,user.notMyKey)
+        #On chiffre uniquement lorsqu'on a un texte
+        if user.entry_empty != True:
+            print("sa")
+            enc_m = rsa_enc(user.message,user.not_my_key)
             message = '- {}: {}'.format(user.nickname, enc_m)
             client.send(message.encode('ascii'))
-            user.entryEmpty = False
+            #Une fois notre message récupéré on indique que il n'y a aucun message
+            user.entry_empty = True
 '''
     Deux threads qui vont lancer les deux fonctions
 '''

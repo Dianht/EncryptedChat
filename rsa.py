@@ -3,7 +3,7 @@ import Crypto.Util.number
 from Crypto.Util.number import inverse
 
 # Generation Des Clé
-def genRsaKeyPair(bits):
+def gen_rsa_key(bits):
     p = Crypto.Util.number.getPrime(bits//2);
     q = Crypto.Util.number.getPrime(bits//2);
     assert(p != q)
